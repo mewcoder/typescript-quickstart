@@ -431,3 +431,123 @@ type Clone<T> = {
 };
 ```
 
+
+
+### 3.2 内置工具
+
+**Partial**
+
+```ts
+type Partial<T> = {
+    [P in keyof T]?: T[P];
+};
+
+
+interface ApiKey {
+  id: number;
+  name: string;
+}
+
+const dataType1: ApiKey = {
+  id: 1,
+  name: 'static'
+}
+
+const dataType2:  Partial<ApiKey> = {
+  name: 'json'
+}
+```
+
+**Record**
+
+```ts
+type Record<K extends keyof any, T> = {
+    [P in K]: T;
+};
+
+type Coord = Record<'x' | 'y', number>;
+
+// 等同于
+type Coord = {
+	x: number;
+	y: number;
+}
+```
+
+**Readonly** 
+
+```ts
+type Readonly<T> = {
+    readonly [P in keyof T]: T[P];
+};
+
+type Coord = Readonly<Record<'x' | 'y', number>>;
+
+// 等同于
+type Coord = {
+    readonly x: number;
+    readonly y: number;
+}
+```
+
+
+
+**Pick**
+
+```ts
+type Pick<T, K extends keyof T> = {
+    [P in K]: T[P];
+};
+
+type Coord = Record<'x' | 'y', number>;
+type CoordX = Pick<Coord, 'x'>;
+
+// 等用于
+type CoordX = {
+	x: number;
+}
+```
+
+**Omit**
+
+```ts
+type Omit<T, K extends keyof any> = Pick<T, Exclude<keyof T, K>>;
+
+interface I1 {
+	a: number;
+	b: string;
+	c: boolean;
+}
+
+type AC = Omit<I1, 'b'>;     // { a:number; c:boolean } 
+type C = Omit<I1, 'a' |'b'>  // { c: boolean }
+
+```
+
+**infer**
+
+`infer`可以在`extends`的条件语句中推断待推断的类型
+
+`infer R` 的位置代表了一个未知的类型，可以理解为在条件类型中给了它一个占位符，然后就可以在后面的三元运算符中使用它。
+
+```ts
+type ReturnType<T> = T extends (...args: any[]) => infer R ? R : any;
+
+type func = () => number;
+type variable = string;
+type funcReturnType = ReturnType<func>; // funcReturnType 类型为 number
+type varReturnType = ReturnType<variable>; // varReturnType 类型为 any
+
+
+type Unpack<T> = T extends Array<infer R> ? R : T
+
+type NumArr = Array<number>
+
+type U = Unpack<NumArr> // number
+```
+
+
+
+## 参考
+
+- [TS 入门完全指南](https://juejin.cn/post/7215796935298596920)
